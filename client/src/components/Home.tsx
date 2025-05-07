@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useWebSocket from "react-use-websocket";
-import type { Owner, SocketMessage, User } from "../types";
+import type { GameResult, Owner, SocketMessage, User } from "../types";
 import { Player } from "./Player";
 import { Game } from "./Game";
+import { getGameResult } from "../features/getGameResult";
 
 const SOCKET_URL = "ws://localhost:3000";
 
@@ -14,6 +15,11 @@ type Props = {
 export const Home = ({ userName, onLogout }: Props) => {
   const [isMyTime, setIsMyTime] = useState(false);
   const [game, setGame] = useState<Owner[] | null>(null);
+  const gameResult = useMemo<GameResult | null>(
+    () => getGameResult(game),
+    [game]
+  );
+
   const [users, setUsers] = useState<User[]>([]);
   const [currentUuid, setCurrentUuid] = useState<string | null>(null);
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<SocketMessage>(
@@ -120,7 +126,7 @@ export const Home = ({ userName, onLogout }: Props) => {
 
   const playAtPosition = useCallback(
     (position: number) => {
-      if (!isMyTime) return;
+      if (!isMyTime || gameResult) return;
       setGame((oldGame) => {
         if (!oldGame) return null;
         if (oldGame[position] !== 0) return oldGame;
@@ -134,7 +140,7 @@ export const Home = ({ userName, onLogout }: Props) => {
         return newGame;
       });
     },
-    [isMyTime, setGame, setIsMyTime, sendJsonMessage]
+    [isMyTime, setGame, setIsMyTime, sendJsonMessage, gameResult]
   );
 
   return (
@@ -146,6 +152,7 @@ export const Home = ({ userName, onLogout }: Props) => {
           playAtPosition={playAtPosition}
           isMyTime={isMyTime}
           game={game}
+          gameResult={gameResult}
         />
       ) : (
         <ol>
