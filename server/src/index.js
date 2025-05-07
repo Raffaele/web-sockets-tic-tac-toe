@@ -76,6 +76,23 @@ function handleMessage(bytes, senderUuid) {
       })
     );
   }
+
+  if (message.action === "resetGame") {
+    const player = connections.get(senderUuid);
+    if (!player?.playingWith) return;
+    const opponent = connections.get(player.playingWith);
+    if (!opponent) return;
+    player.connection.send(
+      JSON.stringify({
+        action: "resetGame",
+      })
+    );
+    opponent.connection.send(
+      JSON.stringify({
+        action: "resetGame",
+      })
+    );
+  }
 }
 
 function endChallenge(senderUuid) {

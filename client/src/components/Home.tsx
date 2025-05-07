@@ -114,6 +114,10 @@ export const Home = ({ userName, onLogout }: Props) => {
       });
       return;
     }
+    if (lastJsonMessage.action === "resetGame") {
+      setGame(Array.from({ length: 9 }, () => 0));
+      return;
+    }
     console.table(lastJsonMessage);
   }, [lastJsonMessage, setGame, setIsMyTime]);
 
@@ -143,6 +147,13 @@ export const Home = ({ userName, onLogout }: Props) => {
     [isMyTime, setGame, setIsMyTime, sendJsonMessage, gameResult]
   );
 
+  const handleGameReset = useCallback(() => {
+    sendJsonMessage({
+      uuid: currentUuid,
+      action: "resetGame",
+    });
+  }, [sendJsonMessage]);
+
   return (
     <div>
       <h1>Hello {userName}</h1>
@@ -153,6 +164,7 @@ export const Home = ({ userName, onLogout }: Props) => {
           isMyTime={isMyTime}
           game={game}
           gameResult={gameResult}
+          onGameReset={handleGameReset}
         />
       ) : (
         <ol>

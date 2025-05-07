@@ -38,13 +38,18 @@ type PlayStepMessage = {
   position: number;
 };
 
+type ResetGameMessage = {
+  action: 'resetGame';
+}
+
 export type SocketMessage =
   | SetupMessage
   | DisconnectMessage
   | ConnectMessage
   | StartChallengeMessage
   | ExitChallengeMessage
-  | PlayStepMessage;
+  | PlayStepMessage
+  | ResetGameMessage;
 
 export type WinningPosition = [number, number, number];
 
